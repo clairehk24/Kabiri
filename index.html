@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Spanish Audio with Captions</title>
+  <title>Spanish Audio with Custom Captions</title>
   <style>
     body {
       font-family: sans-serif;
@@ -13,37 +13,41 @@
     }
 
     .phrase-block {
-      margin-bottom: 40px;
+      margin-bottom: 50px;
     }
 
-    button {
-      padding: 10px 16px;
-      font-size: 1em;
-      cursor: pointer;
+    h2 {
+      font-size: 1.4em;
       margin-bottom: 10px;
     }
 
-    video {
+    audio {
       display: block;
       margin-top: 10px;
       width: 100%;
       max-width: 400px;
-      height: 40px;
-      /* mimics audio player bar */
     }
 
-    ::cue {
-      background: rgba(255, 255, 255, 0.85);
-      color: black;
+    .caption-display {
+      margin-top: 10px;
       font-size: 1.2em;
-      text-align: center;
+      padding: 10px;
+      background-color: #fff3cd;
+      border-left: 6px solid #ffeeba;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    mark {
+      background-color: #ffd54f;
+      padding: 0 4px;
+      border-radius: 4px;
     }
   </style>
 </head>
 
 <body>
-
-  <h1>Spanish Audio with Captions</h1>
+  <h1>Spanish Audio with Custom Captions</h1>
   <div id="phrases-container"></div>
 
   <script>
@@ -51,7 +55,7 @@
       {
         id: "hola",
         text: "Hola",
-        audio: "audio/Hola.mp3",
+        audio: "audio/hola.mp3",
         vtt: "captions/hola.vtt"
       },
       {
@@ -81,22 +85,75 @@
     ];
 
     const container = document.getElementById("phrases-container");
+    const intervals = {}; // store intervals so we can manage them per audio
 
     phrases.forEach(phrase => {
       const block = document.createElement("div");
       block.className = "phrase-block";
       block.innerHTML = `
-        <button onclick="document.getElementById('video-${phrase.id}').play()" aria-label="Reproducir ${phrase.text}">
-          ▶️ ${phrase.text}
-        </button>
-        <video id="video-${phrase.id}" controls preload="metadata">
-          <source src="${phrase.audio}" type="audio/mpeg">
-          <track src="${phrase.vtt}" kind="captions" srclang="es" label="Español" default>
-          Tu navegador no soporta video HTML5.
-        </video>
+        <h2>${phrase.text}</h2>
+        <audio id="audio-${phrase.id}" controls preload="metadata"></audio>
+        <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
       `;
       container.appendChild(block);
+      fetchAndParseVTT(phrase);
+
+      const audio = document.getElementById(`audio-${phrase.id}`);
+      const source = document.createElement("source");
+      source.src = phrase.audio;
+      source.type = "audio/mpeg";
+      audio.appendChild(source);
+
+      audio.addEventListener("play", () => startCaptions(phrase.id));
+      audio.addEventListener("pause", () => stopCaptions(phrase.id));
+      audio.addEventListener("ended", () => stopCaptions(phrase.id));
     });
+
+    const captionsData = {}; // Stores parsed captions for each phrase
+
+    function fetchAndParseVTT(phrase) {
+      fetch(phrase.vtt)
+        .then(res => res.text())
+        .then(vttText => {
+          const captions = [];
+          const blocks = vttText.split(/\n\n+/);
+          blocks.forEach(block => {
+            const lines = block.trim().split('\n');
+            if (lines.length >= 2) {
+              const [start, end] = lines[0].split(' --> ');
+              const text = lines[1];
+              captions.push({
+                start: parseTime(start),
+                end: parseTime(end),
+                text: text.trim()
+              });
+            }
+          });
+          captionsData[phrase.id] = captions;
+        });
+    }
+
+    function parseTime(timeStr) {
+      const [h, m, s] = timeStr.split(":");
+      const [sec, ms] = s.split(".");
+      return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(sec) + parseInt(ms) / 1000;
+    }
+
+    function startCaptions(id) {
+      const audio = document.getElementById(`audio-${id}`);
+      const captionDiv = document.getElementById(`caption-${id}`);
+      const captions = captionsData[id] || [];
+
+      intervals[id] = setInterval(() => {
+        const t = audio.currentTime;
+        const match = captions.find(c => t >= c.start && t <= c.end);
+        captionDiv.innerHTML = match ? `<mark>${match.text}</mark>` : '';
+      }, 100);
+    }
+
+    function stopCaptions(id) {
+      clearInterval(intervals[id]);
+    }
   </script>
 </body>
 
