@@ -6,10 +6,18 @@
   <title>Spanish Audio with Custom Captions</title>
   <style>
     body {
-      font-family: sans-serif;
-      line-height: 1.5;
-      padding: 20px;
-      background-color: #f9f9f9;
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+      background-color: #f4f4f8;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      text-align: center;
+      margin-bottom: 40px;
+      color: #2c3e50;
     }
 
     .phrase-block {
@@ -17,8 +25,18 @@
     }
 
     h2 {
-      font-size: 1.4em;
-      margin-bottom: 10px;
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      cursor: pointer;
+      color: #007acc;
+      background: #e9f4fb;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+
+    h2:hover {
+      background-color: #d3eaf8;
     }
 
     audio {
@@ -30,18 +48,31 @@
 
     .caption-display {
       margin-top: 10px;
-      font-size: 1.2em;
+      font-size: 1.1em;
       padding: 10px;
-      background-color: #fff3cd;
-      border-left: 6px solid #ffeeba;
+      background-color: #fff7e6;
+      border-left: 5px solid #ffd966;
       width: 100%;
       max-width: 400px;
+      border-radius: 4px;
     }
 
     mark {
-      background-color: #ffd54f;
+      background-color: #ffeb99;
       padding: 0 4px;
       border-radius: 4px;
+    }
+
+    .content-block {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+    }
+
+    .content-block.visible {
+      max-height: 500px;
+      opacity: 1;
     }
   </style>
 </head>
@@ -85,15 +116,17 @@
     ];
 
     const container = document.getElementById("phrases-container");
-    const intervals = {}; // store intervals so we can manage them per audio
+    const intervals = {};
 
     phrases.forEach(phrase => {
       const block = document.createElement("div");
       block.className = "phrase-block";
       block.innerHTML = `
-        <h2>${phrase.text}</h2>
-        <audio id="audio-${phrase.id}" controls preload="metadata"></audio>
-        <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
+        <h2 id="heading-${phrase.id}" onclick="toggleVisibility('${phrase.id}')">${phrase.text}</h2>
+        <div id="content-${phrase.id}" class="content-block">
+          <audio id="audio-${phrase.id}" controls preload="metadata"></audio>
+          <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
+        </div>
       `;
       container.appendChild(block);
       fetchAndParseVTT(phrase);
@@ -109,7 +142,18 @@
       audio.addEventListener("ended", () => stopCaptions(phrase.id));
     });
 
-    const captionsData = {}; // Stores parsed captions for each phrase
+    const captionsData = {};
+
+    function toggleVisibility(id) {
+      phrases.forEach(phrase => {
+        const content = document.getElementById(`content-${phrase.id}`);
+        if (phrase.id === id) {
+          content.classList.toggle("visible");
+        } else {
+          content.classList.remove("visible");
+        }
+      });
+    }
 
     function fetchAndParseVTT(phrase) {
       fetch(phrase.vtt)
