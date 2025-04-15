@@ -3,40 +3,115 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Spanish Audio with Custom Captions</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      line-height: 1.6;
-      padding: 40px 20px;
-      background-color: #f4f4f8;
-      color: #333;
+    * {
+      box-sizing: border-box;
     }
 
-    h1 {
-      font-size: 2.2em;
-      text-align: center;
-      margin-bottom: 40px;
-      color: #2c3e50;
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      background-color: #F5F5F5;
+      color: #2E2E30;
+      padding-top: 60px;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background-color: #C51D34;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .navbar-title {
+      font-size: 1.4em;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .navbar-search {
+      display: flex;
+      align-items: center;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .navbar-search input {
+      padding: 6px 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px 0 0 4px;
+      width: 180px;
+      max-width: 50vw;
+    }
+
+    .navbar-search button {
+      padding: 6px 12px;
+      border: none;
+      background-color: #2E2E30;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .clear-button {
+      background-color: #2E2E30;
+      border-radius: 0 4px 4px 0;
+      margin-left: 0;
+    }
+
+    input:focus,
+    button:focus {
+      outline: 3px solid #C51D34;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 500px) {
+      .navbar-search input {
+        width: 120px;
+      }
+
+      .navbar-title {
+        font-size: 1.1em;
+      }
     }
 
     .phrase-block {
-      margin-bottom: 50px;
+      margin: 30px 20px;
     }
 
     h2 {
       font-size: 1.5em;
       margin-bottom: 15px;
       cursor: pointer;
-      color: #007acc;
-      background: #e9f4fb;
+      color: #C51D34;
+      background: #F5F5F5;
       padding: 10px 15px;
       border-radius: 8px;
       transition: background-color 0.3s;
+      border: 2px solid #C51D34;
     }
 
     h2:hover {
-      background-color: #d3eaf8;
+      background-color: #f9c7ce;
+    }
+
+    h2:focus {
+      outline: 3px solid #C51D34;
+      outline-offset: 4px;
     }
 
     audio {
@@ -50,15 +125,16 @@
       margin-top: 10px;
       font-size: 1.1em;
       padding: 10px;
-      background-color: #fff7e6;
-      border-left: 5px solid #ffd966;
+      background-color: #ffffff;
+      border-left: 5px solid #808080;
       width: 100%;
       max-width: 400px;
       border-radius: 4px;
     }
 
     mark {
-      background-color: #ffeb99;
+      background-color: #C51D34;
+      color: white;
       padding: 0 4px;
       border-radius: 4px;
     }
@@ -68,91 +144,125 @@
       overflow: hidden;
       transition: max-height 0.5s ease, opacity 0.5s ease;
       opacity: 0;
+      pointer-events: none;
     }
 
     .content-block.visible {
       max-height: 500px;
       opacity: 1;
+      pointer-events: auto;
+    }
+
+    .content-block:not(.visible) audio,
+    .content-block:not(.visible) .caption-display {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .content-block.visible audio,
+    .content-block.visible .caption-display {
+      visibility: visible;
     }
   </style>
 </head>
 
 <body>
-  <h1>Spanish Audio with Custom Captions</h1>
+  <nav class="navbar">
+    <div class="navbar-title">Spanish Captions</div>
+    <div class="navbar-search">
+      <input type="text" id="searchInput" placeholder="Search phrases..." oninput="filterPhrases()">
+      <button class="clear-button" onclick="clearSearch()" aria-label="Clear search">✕</button>
+    </div>
+  </nav>
+
   <div id="phrases-container"></div>
 
   <script>
     const phrases = [
-      {
-        id: "hola",
-        text: "Hola",
-        audio: "audio/Hola.mp3",
-        vtt: "captions/hola.vtt"
-      },
-      {
-        id: "como_estas",
-        text: "¿Cómo estás?",
-        audio: "audio/como_estas.mp3",
-        vtt: "captions/como_estas.vtt"
-      },
-      {
-        id: "buenos_dias",
-        text: "Buenos días",
-        audio: "audio/buenos_dias.mp3",
-        vtt: "captions/buenos_dias.vtt"
-      },
-      {
-        id: "gracias",
-        text: "Gracias",
-        audio: "audio/gracias.mp3",
-        vtt: "captions/gracias.vtt"
-      },
-      {
-        id: "hasta_luego",
-        text: "Hasta luego",
-        audio: "audio/hasta_luego.mp3",
-        vtt: "captions/hasta_luego.vtt"
-      }
+      { id: "hola", text: "Hola", audio: "audio/hola.mp3", vtt: "captions/hola.vtt" },
+      { id: "como_estas", text: "¿Cómo estás?", audio: "audio/como_estas.mp3", vtt: "captions/como_estas.vtt" },
+      { id: "buenos_dias", text: "Buenos días", audio: "audio/buenos_dias.mp3", vtt: "captions/buenos_dias.vtt" },
+      { id: "gracias", text: "Gracias", audio: "audio/gracias.mp3", vtt: "captions/gracias.vtt" },
+      { id: "hasta_luego", text: "Hasta luego", audio: "audio/hasta_luego.mp3", vtt: "captions/hasta_luego.vtt" }
     ];
 
     const container = document.getElementById("phrases-container");
     const intervals = {};
-
-    phrases.forEach(phrase => {
-      const block = document.createElement("div");
-      block.className = "phrase-block";
-      block.innerHTML = `
-        <h2 id="heading-${phrase.id}" onclick="toggleVisibility('${phrase.id}')">${phrase.text}</h2>
-        <div id="content-${phrase.id}" class="content-block">
-          <audio id="audio-${phrase.id}" controls preload="metadata"></audio>
-          <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
-        </div>
-      `;
-      container.appendChild(block);
-      fetchAndParseVTT(phrase);
-
-      const audio = document.getElementById(`audio-${phrase.id}`);
-      const source = document.createElement("source");
-      source.src = phrase.audio;
-      source.type = "audio/mpeg";
-      audio.appendChild(source);
-
-      audio.addEventListener("play", () => startCaptions(phrase.id));
-      audio.addEventListener("pause", () => stopCaptions(phrase.id));
-      audio.addEventListener("ended", () => stopCaptions(phrase.id));
-    });
-
     const captionsData = {};
+
+    function normalize(str) {
+      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      renderPhrases(phrases);
+    }
+
+    function filterPhrases() {
+      const query = normalize(document.getElementById("searchInput").value);
+      const filtered = phrases.filter(p => normalize(p.text).includes(query));
+      renderPhrases(filtered);
+    }
+
+    function renderPhrases(filteredPhrases) {
+      container.innerHTML = '';
+      filteredPhrases.forEach(phrase => {
+        const block = document.createElement("div");
+        block.className = "phrase-block";
+        block.innerHTML = `
+          <h2 id="heading-${phrase.id}" tabindex="0" aria-controls="content-${phrase.id}" aria-expanded="false"
+              onclick="toggleVisibility('${phrase.id}')" onkeydown="handleKey(event, '${phrase.id}')">
+            ${phrase.text}
+          </h2>
+          <div id="content-${phrase.id}" class="content-block">
+            <audio id="audio-${phrase.id}" controls preload="metadata" tabindex="-1">
+              <source src="${phrase.audio}" type="audio/mpeg">
+            </audio>
+            <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
+          </div>
+        `;
+        container.appendChild(block);
+        fetchAndParseVTT(phrase);
+
+        const audio = document.getElementById(`audio-${phrase.id}`);
+        audio.addEventListener("play", () => startCaptions(phrase.id));
+        audio.addEventListener("pause", () => stopCaptions(phrase.id));
+        audio.addEventListener("ended", () => stopCaptions(phrase.id));
+      });
+    }
 
     function toggleVisibility(id) {
       phrases.forEach(phrase => {
         const content = document.getElementById(`content-${phrase.id}`);
-        if (phrase.id === id) {
-          content.classList.toggle("visible");
-        } else {
-          content.classList.remove("visible");
+        const heading = document.getElementById(`heading-${phrase.id}`);
+        const isCurrent = phrase.id === id;
+
+        if (content && heading) {
+          if (isCurrent) {
+            const isVisible = content.classList.toggle("visible");
+            heading.setAttribute("aria-expanded", isVisible);
+            const audio = content.querySelector('audio');
+            if (isVisible) {
+              audio.setAttribute('tabindex', '0');
+            } else {
+              audio.setAttribute('tabindex', '-1');
+            }
+          } else {
+            content.classList.remove("visible");
+            heading.setAttribute("aria-expanded", false);
+            const audio = content.querySelector('audio');
+            if (audio) audio.setAttribute('tabindex', '-1');
+          }
         }
       });
+    }
+
+    function handleKey(e, id) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleVisibility(id);
+      }
     }
 
     function fetchAndParseVTT(phrase) {
@@ -166,10 +276,15 @@
             if (lines.length >= 2) {
               const [start, end] = lines[0].split(' --> ');
               const text = lines[1];
-              captions.push({
-                start: parseTime(start),
-                end: parseTime(end),
-                text: text.trim()
+              const words = text.trim().split(/\s+/);
+              const duration = parseTime(end) - parseTime(start);
+              const wordDuration = duration / words.length;
+              words.forEach((word, i) => {
+                captions.push({
+                  word,
+                  start: parseTime(start) + i * wordDuration,
+                  end: parseTime(start) + (i + 1) * wordDuration
+                });
               });
             }
           });
@@ -187,17 +302,27 @@
       const audio = document.getElementById(`audio-${id}`);
       const captionDiv = document.getElementById(`caption-${id}`);
       const captions = captionsData[id] || [];
-
       intervals[id] = setInterval(() => {
         const t = audio.currentTime;
-        const match = captions.find(c => t >= c.start && t <= c.end);
-        captionDiv.innerHTML = match ? `<mark>${match.text}</mark>` : '';
+        const highlighted = captions.map(c =>
+          t >= c.start && t <= c.end ? `<mark>${c.word}</mark>` : c.word
+        );
+        captionDiv.innerHTML = highlighted.join(" ");
       }, 100);
     }
 
     function stopCaptions(id) {
       clearInterval(intervals[id]);
     }
+
+    renderPhrases(phrases);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById("searchInput").focus();
+      }
+    });
   </script>
 </body>
 
