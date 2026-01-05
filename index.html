@@ -1,329 +1,708 @@
 <!DOCTYPE html>
 <html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spanish Audio with Custom Captions</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: "Agenda", sans-serif; /* force all elements to Agenda (or fallback) */
+      }
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spanish Audio with Custom Captions</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+      :root {
+        --nav-height: 80px;
+        --gold-height: 15px;
+      }
 
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      margin: 0;
-      background-color: #F5F5F5;
-      color: #2E2E30;
-      padding-top: 60px;
-    }
+      body {
+        line-height: 1.6;
+        margin: 0;
+        background-color: #f5f5f5;
+        color: #2e2e30;
+        padding-top: calc(var(--nav-height) + var(--gold-height) + 10px);
+      }
 
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background-color: #C51D34;
-      color: white;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--nav-height);
+        background-color: #156498;
+        color: white;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      }
 
-    .navbar-title {
-      font-size: 1.4em;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .navbar-search {
-      display: flex;
-      align-items: center;
-      max-width: 100%;
-      overflow: hidden;
-    }
-
-    .navbar-search input {
-      padding: 6px 10px;
-      font-size: 1em;
-      border: none;
-      border-radius: 4px 0 0 4px;
-      width: 180px;
-      max-width: 50vw;
-    }
-
-    .navbar-search button {
-      padding: 6px 12px;
-      border: none;
-      background-color: #2E2E30;
-      color: white;
-      font-size: 1em;
-      cursor: pointer;
-    }
-
-    .clear-button {
-      background-color: #2E2E30;
-      border-radius: 0 4px 4px 0;
-      margin-left: 0;
-    }
-
-    input:focus,
-    button:focus {
-      outline: 3px solid #C51D34;
-      outline-offset: 2px;
-    }
-
-    @media (max-width: 500px) {
-      .navbar-search input {
-        width: 120px;
+      .gold-banner {
+        position: fixed;
+        top: var(--nav-height);
+        left: 0;
+        width: 100%;
+        height: var(--gold-height);
+        background: #efba45;
+        z-index: 999;
       }
 
       .navbar-title {
-        font-size: 1.1em;
+        font-size: 2.5em;
+        font-weight: 700;
+        white-space: nowrap;
       }
-    }
 
-    .phrase-block {
-      margin: 30px 20px;
-    }
+      .navbar-search {
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      .navbar-search input {
+        padding: 6px 10px;
+        font-size: 1em;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        width: 180px;
+        max-width: 50vw;
+      }
+      .navbar-search button {
+        padding: 6px 12px;
+        border: none;
+        background-color: #2e2e30;
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      .clear-button {
+        background-color: #2e2e30;
+        border-radius: 0 4px 4px 0;
+        margin-left: 0;
+      }
 
-    h2 {
-      font-size: 1.5em;
-      margin-bottom: 15px;
-      cursor: pointer;
-      color: #C51D34;
-      background: #F5F5F5;
-      padding: 10px 15px;
-      border-radius: 8px;
-      transition: background-color 0.3s;
-      border: 2px solid #C51D34;
-    }
+      input:focus,
+      button:focus {
+        outline: 3px solid #c5981d;
+        outline-offset: 2px;
+      }
 
-    h2:hover {
-      background-color: #f9c7ce;
-    }
+      @media (max-width: 500px) {
+        .navbar-search input {
+          width: 120px;
+        }
+        .navbar-title {
+          font-size: 1.1em;
+        }
+      }
 
-    h2:focus {
-      outline: 3px solid #C51D34;
-      outline-offset: 4px;
-    }
+      .chapter-block {
+        margin: 20px;
+      }
 
-    audio {
-      display: block;
-      margin-top: 10px;
-      width: 100%;
-      max-width: 400px;
-    }
+      .chapter-btn {
+        width: 50%;
+        max-width: 520px;
+        min-width: 260px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        font-size: 1.4em;
+        font-weight: 700; /* Agenda Bold (assumes bold face is available) */
+        cursor: pointer;
+        color: white;
+        background: #156498;
+        border: 2px solid #156498;
+        border-radius: 10px;
+      }
 
-    .caption-display {
-      margin-top: 10px;
-      font-size: 1.1em;
-      padding: 10px;
-      background-color: #ffffff;
-      border-left: 5px solid #808080;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 4px;
-    }
+      @media (max-width: 700px) {
+        .chapter-btn {
+          width: 90%;
+        }
+      }
 
-    mark {
-      background-color: #C51D34;
-      color: white;
-      padding: 0 4px;
-      border-radius: 4px;
-    }
+      .chapter-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .chapter-content.visible {
+        max-height: 10000px;
+        opacity: 1;
+        pointer-events: auto;
+      }
 
-    .content-block {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s ease, opacity 0.5s ease;
-      opacity: 0;
-      pointer-events: none;
-    }
+      .phrase-block {
+        margin: 16px 20px;
+      }
 
-    .content-block.visible {
-      max-height: 500px;
-      opacity: 1;
-      pointer-events: auto;
-    }
+      h2 {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+        cursor: pointer;
+        color: #d54d32;
+        background: #f5f5f5;
+        padding: 10px 15px;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+        border: 2px solid #d54d32;
+      }
+      h2:hover {
+        background-color: #d54d3281;
+      }
+      h2:focus {
+        outline: 3px solid #d54d32;
+        outline-offset: 4px;
+      }
 
-    .content-block:not(.visible) audio,
-    .content-block:not(.visible) .caption-display {
-      visibility: hidden;
-      pointer-events: none;
-    }
+      audio {
+        display: block;
+        margin-top: 10px;
+        width: 100%;
+        max-width: 400px;
+      }
 
-    .content-block.visible audio,
-    .content-block.visible .caption-display {
-      visibility: visible;
-    }
-  </style>
-</head>
+      .caption-display {
+        margin-top: 10px;
+        font-size: 1.1em;
+        padding: 10px;
+        background-color: #ffffff;
+        border-left: 5px solid #808080;
+        width: 100%;
+        max-width: 400px;
+        border-radius: 4px;
+      }
 
-<body>
-  <nav class="navbar">
-    <div class="navbar-title">Bilingual Bites​</div>
-    <div class="navbar-search">
-      <input type="text" id="searchInput" placeholder="Search phrases..." oninput="filterPhrases()">
-      <button class="clear-button" onclick="clearSearch()" aria-label="Clear search">✕</button>
-    </div>
-  </nav>
+      mark {
+        background-color: #d54d32;
+        color: white;
+        padding: 0 4px;
+        border-radius: 4px;
+      }
 
-  <div id="phrases-container"></div>
+      .content-block {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, opacity 0.5s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+      .content-block.visible {
+        max-height: 500px;
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .content-block:not(.visible) audio,
+      .content-block:not(.visible) .caption-display {
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .content-block.visible audio,
+      .content-block.visible .caption-display {
+        visibility: visible;
+      }
+    </style>
+  </head>
 
-  <script>
-    const phrases = [
-      { id: "hola Hello", text: "Hola - Hello", audio: "audio/hola.mp3", vtt: "captions/hola.vtt" },
-      { id: "como_estas How_are_you?", text: "¿Cómo estás? - How are you?", audio: "audio/como_estas.mp3", vtt: "captions/como_estas.vtt" },
-      { id: "buenos_dias Good_morning", text: "Buenos días - Good morning", audio: "audio/buenos_dias.mp3", vtt: "captions/buenos_dias.vtt" },
-      { id: "gracias thank_you", text: "Gracias - Thank you", audio: "audio/gracias.mp3", vtt: "captions/gracias.vtt" },
-      { id: "hasta_luego See_you_later", text: "Hasta luego - See you later", audio: "audio/hasta_luego.mp3", vtt: "captions/hasta_luego.vtt" }
-    ];
+  <body>
+    <nav class="navbar">
+      <div class="navbar-title">Bilingual Bites​</div>
+      <div class="navbar-search">
+        <input type="text" id="searchInput" placeholder="Search phrases..." oninput="filterPhrases()" />
+        <button class="clear-button" onclick="clearSearch()" aria-label="Clear search">✕</button>
+      </div>
+    </nav>
 
-    const container = document.getElementById("phrases-container");
-    const intervals = {};
-    const captionsData = {};
+    <div class="gold-banner" aria-hidden="true"></div>
+    <!-- Chapters render here -->
+    <div id="chapters-container"></div>
 
-    function normalize(str) {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    }
+    <script>
+      // -----------------------
+      // 1) Chapters data model
+      // -----------------------
+      const chapters = [
+        {
+          id: "ch1",
+          title: "Chapter 1",
+          phrases: [
+            { id: "Hi!_My_name_is", text: "Hi! My name is", audio: "audio/Ch1/Ch1_001.m4a", vtt: "captions/Ch1/Ch1_001.vtt" },
+            { id: "I_am_a(n)", text: "I am a(n)", audio: "audio/Ch1/Ch1_002.m4a", vtt: "captions/Ch1/Ch1_002.vtt" },
+            { id: "athletic_trainer", text: "Athletic trainer", audio: "audio/Ch1/Ch1_003.m4a", vtt: "captions/Ch1/Ch1_003.vtt" },
+            { id: "Doctor", text: "Doctor", audio: "audio/Ch1/Ch1_004.m4a", vtt: "captions/Ch1/Ch1_004.vtt" },
+            { id: "Exercise_professional", text: "Exercise professional", audio: "audio/Ch1/Ch1_005.m4a", vtt: "captions/Ch1/Ch1_005.vtt" },
+            { id: "Nurse", text: "Nurse", audio: "audio/Ch1/Ch1_006.m4a", vtt: "captions/Ch1/Ch1_006.vtt" },
+            { id: "Occupational_therapist", text: "Occupational therapist", audio: "audio/Ch1/Ch1_007.m4a", vtt: "captions/Ch1/Ch1_007.vtt" },
+            { id: "Physical_therapist", text: "Physical therapist", audio: "audio/Ch1/Ch1_008.m4a", vtt: "captions/Ch1/Ch1_008.vtt" },
+            { id: "Physicians_assistant", text: "Physician’s assistant", audio: "audio/Ch1/Ch1_009.m4a", vtt: "captions/Ch1/Ch1_009.vtt" },
+            { id: "Im_here_to_help", text: "I’m here to help.", audio: "audio/Ch1/Ch1_010.m4a", vtt: "captions/Ch1/Ch1_010.vtt" },
+            { id: "yes_no", text: "Yes/No", audio: "audio/Ch1/Ch1_011.m4a", vtt: "captions/Ch1/Ch1_011.vtt" },
+            { id: "please", text: "Please", audio: "audio/Ch1/Ch1_012.m4a", vtt: "captions/Ch1/Ch1_012.vtt" },
+            { id: "Thank_you", text: "Thank you", audio: "audio/Ch1/Ch1_013.m4a", vtt: "captions/Ch1/Ch1_013.vtt" },
+            { id: "more_less", text: "More/Less", audio: "audio/Ch1/Ch1_014.m4a", vtt: "captions/Ch1/Ch1_014.vtt" },
+            { id: "better_worse", text: "Better/Worse", audio: "audio/Ch1/Ch1_015.m4a", vtt: "captions/Ch1/Ch1_015.vtt" },
+            { id: "goodbye", text: "Goodbye", audio: "audio/Ch1/Ch1_016.m4a", vtt: "captions/Ch1/Ch1_016.vtt" },
+            { id: "See_you", text: "See you", audio: "audio/Ch1/Ch1_017.m4a", vtt: "captions/Ch1/Ch1_017.vtt" },
+            { id: "next_visit", text: "Next visit", audio: "audio/Ch1/Ch1_018.m4a", vtt: "captions/Ch1/Ch1_018.vtt" },
+            { id: "next_week", text: "Next week", audio: "audio/Ch1/Ch1_019.m4a", vtt: "captions/Ch1/Ch1_019.vtt" },
+            { id: "next_month", text: "Next month", audio: "audio/Ch1/Ch1_020.m4a", vtt: "captions/Ch1/Ch1_020.vtt" },
+            { id: "next_year", text: "Next year", audio: "audio/Ch1/Ch1_021.m4a", vtt: "captions/Ch1/Ch1_021.vtt" },
+          ],
+        },
 
-    function clearSearch() {
-      document.getElementById("searchInput").value = "";
-      renderPhrases(phrases);
-    }
+        {
+          id: "ch2",
+          title: "Chapter 2",
+          phrases: [
+            { id: "Do_you_have_pain", text: "Do you have pain?", audio: "audio/Ch2/Ch2_022.m4a", vtt: "captions/Ch2/Ch2_022.vtt" },
+            {
+              id: "Pain_scale_0_to_10",
+              text: "If 0 is no pain and 10 is the most, how bad is your pain now?",
+              audio: "audio/Ch2/Ch2_023.m4a",
+              vtt: "captions/Ch2/Ch2_023.vtt",
+            },
+            { id: "Point_where_it_hurts", text: "Point where it hurts.", audio: "audio/Ch2/Ch2_024.m4a", vtt: "captions/Ch2/Ch2_024.vtt" },
+            { id: "Do_you_live_alone", text: "Do you live alone?", audio: "audio/Ch2/Ch2_025.m4a", vtt: "captions/Ch2/Ch2_025.vtt" },
+            { id: "Who_lives_with_you", text: "Who lives with you?", audio: "audio/Ch2/Ch2_026.m4a", vtt: "captions/Ch2/Ch2_026.vtt" },
+            {
+              id: "Steps_or_stairs_home_bathroom",
+              text: "Do you have to use steps or stairs to get in your house? To get to your bathroom?",
+              audio: "audio/Ch2/Ch2_027.m4a",
+              vtt: "captions/Ch2/Ch2_027.vtt",
+            },
+            {
+              id: "Feel_where_it_hurts_ok",
+              text: "I need to feel where it hurts. Is that OK?",
+              audio: "audio/Ch2/Ch2_028.m4a",
+              vtt: "captions/Ch2/Ch2_028.vtt",
+            },
+          ],
+        },
 
-    function filterPhrases() {
-      const query = normalize(document.getElementById("searchInput").value);
-      const filtered = phrases.filter(p => normalize(p.text).includes(query));
-      renderPhrases(filtered);
-    }
+        {
+          id: "ch3",
+          title: "Chapter 3",
+          phrases: [
+            { id: "Which_ellipsis", text: "Which ... ?", audio: "audio/Ch3/Ch3_029.m4a", vtt: "captions/Ch3/Ch3_029.vtt" },
+            { id: "How_much_ellipsis", text: "How much ... ?", audio: "audio/Ch3/Ch3_030.m4a", vtt: "captions/Ch3/Ch3_030.vtt" },
+            { id: "medicine", text: "Medicine", audio: "audio/Ch3/Ch3_031.m4a", vtt: "captions/Ch3/Ch3_031.vtt" },
+            { id: "pill", text: "Pill", audio: "audio/Ch3/Ch3_032.m4a", vtt: "captions/Ch3/Ch3_032.vtt" },
+            { id: "pharmacy", text: "Pharmacy", audio: "audio/Ch3/Ch3_033.m4a", vtt: "captions/Ch3/Ch3_033.vtt" },
+            { id: "Need_heart_pill", text: "Do you need your heart pill?", audio: "audio/Ch3/Ch3_034.m4a", vtt: "captions/Ch3/Ch3_034.vtt" },
+            { id: "Need_pain_medicine", text: "Do you need your pain medicine?", audio: "audio/Ch3/Ch3_035.m4a", vtt: "captions/Ch3/Ch3_035.vtt" },
+            {
+              id: "Pain_meds_30_min_ago",
+              text: "Did you take your pain medicine at least 30 minutes ago?",
+              audio: "audio/Ch3/Ch3_036.m4a",
+              vtt: "captions/Ch3/Ch3_036.vtt",
+            },
+          ],
+        },
 
-    function renderPhrases(filteredPhrases) {
-      container.innerHTML = '';
-      filteredPhrases.forEach(phrase => {
-        const block = document.createElement("div");
-        block.className = "phrase-block";
-        block.innerHTML = `
-          <h2 id="heading-${phrase.id}" tabindex="0" aria-controls="content-${phrase.id}" aria-expanded="false"
-              onclick="toggleVisibility('${phrase.id}')" onkeydown="handleKey(event, '${phrase.id}')">
-            ${phrase.text}
-          </h2>
-          <div id="content-${phrase.id}" class="content-block">
-            <audio id="audio-${phrase.id}" controls preload="metadata" tabindex="-1">
-              <source src="${phrase.audio}" type="audio/mpeg">
-            </audio>
-            <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
-          </div>
-        `;
-        container.appendChild(block);
-        fetchAndParseVTT(phrase);
+        {
+          id: "ch4",
+          title: "Chapter 4",
+          phrases: [
+            { id: "Head", text: "Head", audio: "audio/Ch4/Ch4_038.m4a", vtt: "captions/Ch4/Ch4_038.vtt" },
+            { id: "Neck", text: "Neck", audio: "audio/Ch4/Ch4_039.m4a", vtt: "captions/Ch4/Ch4_039.vtt" },
+            { id: "Back", text: "Back", audio: "audio/Ch4/Ch4_040.m4a", vtt: "captions/Ch4/Ch4_040.vtt" },
+            { id: "Chest", text: "Chest", audio: "audio/Ch4/Ch4_041.m4a", vtt: "captions/Ch4/Ch4_041.vtt" },
+            { id: "Abdomen", text: "Abdomen", audio: "audio/Ch4/Ch4_042.m4a", vtt: "captions/Ch4/Ch4_042.vtt" },
+            { id: "Shoulder", text: "Shoulder", audio: "audio/Ch4/Ch4_043.m4a", vtt: "captions/Ch4/Ch4_043.vtt" },
+            { id: "Arm", text: "Arm", audio: "audio/Ch4/Ch4_044.m4a", vtt: "captions/Ch4/Ch4_044.vtt" },
+            { id: "Elbow", text: "Elbow", audio: "audio/Ch4/Ch4_045.m4a", vtt: "captions/Ch4/Ch4_045.vtt" },
+            { id: "Wrist", text: "Wrist", audio: "audio/Ch4/Ch4_046.m4a", vtt: "captions/Ch4/Ch4_046.vtt" },
+            { id: "Hand", text: "Hand", audio: "audio/Ch4/Ch4_047.m4a", vtt: "captions/Ch4/Ch4_047.vtt" },
+            { id: "Finger", text: "Finger", audio: "audio/Ch4/Ch4_048.m4a", vtt: "captions/Ch4/Ch4_048.vtt" },
+            { id: "Hip", text: "Hip", audio: "audio/Ch4/Ch4_049.m4a", vtt: "captions/Ch4/Ch4_049.vtt" },
+            { id: "Leg", text: "Leg", audio: "audio/Ch4/Ch4_050.m4a", vtt: "captions/Ch4/Ch4_050.vtt" },
+            { id: "Knee", text: "Knee", audio: "audio/Ch4/Ch4_051.m4a", vtt: "captions/Ch4/Ch4_051.vtt" },
+            { id: "Ankle", text: "Ankle", audio: "audio/Ch4/Ch4_052.m4a", vtt: "captions/Ch4/Ch4_052.vtt" },
+            { id: "Foot", text: "Foot", audio: "audio/Ch4/Ch4_053.m4a", vtt: "captions/Ch4/Ch4_053.vtt" },
+            { id: "Toe", text: "Toe", audio: "audio/Ch4/Ch4_054.m4a", vtt: "captions/Ch4/Ch4_054.vtt" },
+            { id: "Muscle", text: "Muscle", audio: "audio/Ch4/Ch4_055.m4a", vtt: "captions/Ch4/Ch4_055.vtt" },
+            { id: "Muscle_strain", text: "Muscle strain", audio: "audio/Ch4/Ch4_056.m4a", vtt: "captions/Ch4/Ch4_056.vtt" },
+            { id: "Tendinitis", text: "Tendinitis", audio: "audio/Ch4/Ch4_057.m4a", vtt: "captions/Ch4/Ch4_057.vtt" },
+            { id: "Lift_your", text: "Lift your...", audio: "audio/Ch4/Ch4_058.m4a", vtt: "captions/Ch4/Ch4_058.vtt" },
+            { id: "Bend_your", text: "Bend your...", audio: "audio/Ch4/Ch4_059.m4a", vtt: "captions/Ch4/Ch4_059.vtt" },
+            { id: "Straighten_your", text: "Straighten your...", audio: "audio/Ch4/Ch4_060.m4a", vtt: "captions/Ch4/Ch4_060.vtt" },
+            { id: "Push_with_your", text: "Push with your…", audio: "audio/Ch4/Ch4_061.m4a", vtt: "captions/Ch4/Ch4_061.vtt" },
+            { id: "Repeat_5_or_10_times", text: "Repeat 5 [or 10] times.", audio: "audio/Ch4/Ch4_062.m4a", vtt: "captions/Ch4/Ch4_062.vtt" },
+            { id: "One_more_time", text: "One more time.", audio: "audio/Ch4/Ch4_063.m4a", vtt: "captions/Ch4/Ch4_063.vtt" },
+            {
+              id: "Ice_10_minutes_every_hour",
+              text: "Put ice on it for 10 minutes every hour.",
+              audio: "audio/Ch4/Ch4_064.m4a",
+              vtt: "captions/Ch4/Ch4_064.vtt",
+            },
+            { id: "Wear_this_to_help_it_heal", text: "Wear this to help it heal.", audio: "audio/Ch4/Ch4_065.m4a", vtt: "captions/Ch4/Ch4_065.vtt" },
+          ],
+        },
+        {
+          id: "ch5",
+          title: "Chapter 5",
+          phrases: [
+            { id: "Arthritis", text: "Arthritis", audio: "audio/Ch5/Ch5_066.m4a", vtt: "captions/Ch5/Ch5_066.vtt" },
+            { id: "Bone_bones", text: "Bone/bones", audio: "audio/Ch5/Ch5_067.m4a", vtt: "captions/Ch5/Ch5_067.vtt" },
+            { id: "Crutches", text: "Crutches", audio: "audio/Ch5/Ch5_068.m4a", vtt: "captions/Ch5/Ch5_068.vtt" },
+            { id: "Fracture", text: "Fracture", audio: "audio/Ch5/Ch5_069.m4a", vtt: "captions/Ch5/Ch5_069.vtt" },
+            { id: "Joint", text: "Joint", audio: "audio/Ch5/Ch5_070.m4a", vtt: "captions/Ch5/Ch5_070.vtt" },
+            { id: "Ligament", text: "Ligament", audio: "audio/Ch5/Ch5_071.m4a", vtt: "captions/Ch5/Ch5_071.vtt" },
+            { id: "Sprain", text: "Sprain", audio: "audio/Ch5/Ch5_072.m4a", vtt: "captions/Ch5/Ch5_072.vtt" },
+            { id: "Broken_bone_in_your", text: "You have a broken bone in your…", audio: "audio/Ch5/Ch5_073.m4a", vtt: "captions/Ch5/Ch5_073.vtt" },
+            { id: "Sprain_in_your", text: "You have a sprain in your…", audio: "audio/Ch5/Ch5_074.m4a", vtt: "captions/Ch5/Ch5_074.vtt" },
+            {
+              id: "No_weight_on_your",
+              text: "You cannot put any weight through your... (NWB)",
+              audio: "audio/Ch5/Ch5_075.m4a",
+              vtt: "captions/Ch5/Ch5_075.vtt",
+            },
+            {
+              id: "TTWB",
+              text: "You can put your toes on the ground but no weight on your leg. (TTWB)",
+              audio: "audio/Ch5/Ch5_076.m4a",
+              vtt: "captions/Ch5/Ch5_076.vtt",
+            },
+            {
+              id: "Some_weight",
+              text: "You can put some, but not all, of your weight through your...(PWB)",
+              audio: "audio/Ch5/Ch5_077.m4a",
+              vtt: "captions/Ch5/Ch5_077.vtt",
+            },
+            {
+              id: "WBAT",
+              text: "You can put as much weight as you want through your... (WBAT)",
+              audio: "audio/Ch5/Ch5_078.m4a",
+              vtt: "captions/Ch5/Ch5_078.vtt",
+            },
+            { id: "FWB", text: "You can put all your weight through your... (FWB)", audio: "audio/Ch5/Ch5_079.m4a", vtt: "captions/Ch5/Ch5_079.vtt" },
+          ],
+        },
+        {
+          id: "ch6",
+          title: "Chapter 6",
+          phrases: [
+            { id: "heart", text: "Heart", audio: "audio/Ch6/Ch6_080.wav", vtt: "captions/Ch6/Ch6_080.vtt" },
+            { id: "blood", text: "Blood", audio: "audio/Ch6/Ch6_081.wav", vtt: "captions/Ch6/Ch6_081.vtt" },
+            { id: "artery", text: "Artery", audio: "audio/Ch6/Ch6_082.wav", vtt: "captions/Ch6/Ch6_082.vtt" },
+            { id: "vein", text: "Vein", audio: "audio/Ch6/Ch6_083.wav", vtt: "captions/Ch6/Ch6_083.vtt" },
+            { id: "blood_clot", text: "Blood clot", audio: "audio/Ch6/Ch6_084.wav", vtt: "captions/Ch6/Ch6_084.vtt" },
+            { id: "aerobic_exercise", text: "Aerobic exercise", audio: "audio/Ch6/Ch6_085.wav", vtt: "captions/Ch6/Ch6_085.vtt" },
+            { id: "walking", text: "Walking", audio: "audio/Ch6/Ch6_086.wav", vtt: "captions/Ch6/Ch6_086.vtt" },
+            { id: "swimming", text: "Swimming", audio: "audio/Ch6/Ch6_087.wav", vtt: "captions/Ch6/Ch6_087.vtt" },
+          ],
+        },
+        { id: "ch7", title: "Chapter 7", phrases: [] },
+        { id: "ch8", title: "Chapter 8", phrases: [] },
+        { id: "ch9", title: "Chapter 9", phrases: [] },
+        { id: "ch10", title: "Chapter 10", phrases: [] },
+        { id: "ch11", title: "Chapter 11", phrases: [] },
+        { id: "ch12", title: "Chapter 12", phrases: [] },
+        { id: "ch13", title: "Chapter 13", phrases: [] },
+      ];
 
-        const audio = document.getElementById(`audio-${phrase.id}`);
-        audio.addEventListener("play", () => startCaptions(phrase.id));
-        audio.addEventListener("pause", () => stopCaptions(phrase.id));
-        audio.addEventListener("ended", () => stopCaptions(phrase.id));
-      });
-    }
+      const chaptersContainer = document.getElementById("chapters-container");
+      const intervals = {};
+      const captionsData = {}; // cue-level: [{start,end,text,words:[...]}]
 
-    function toggleVisibility(id) {
-      phrases.forEach(phrase => {
-        const content = document.getElementById(`content-${phrase.id}`);
-        const heading = document.getElementById(`heading-${phrase.id}`);
-        const isCurrent = phrase.id === id;
+      function getAllPhrases() {
+        return chapters.flatMap((ch) => ch.phrases);
+      }
 
-        if (content && heading) {
+      function normalize(str) {
+        return str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase();
+      }
+
+      // -----------------------
+      // 2) Search across chapters
+      // -----------------------
+      function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        renderChapters(chapters);
+      }
+
+      function filterPhrases() {
+        const query = normalize(document.getElementById("searchInput").value);
+
+        if (!query) {
+          renderChapters(chapters);
+          return;
+        }
+
+        const filtered = chapters
+          .map((ch) => ({
+            ...ch,
+            phrases: ch.phrases.filter((p) => normalize(p.text).includes(query)),
+          }))
+          .filter((ch) => ch.phrases.length > 0);
+
+        renderChapters(filtered);
+      }
+
+      // -----------------------
+      // 3) Render chapters + phrases (UPDATED: start collapsed)
+      // -----------------------
+      function renderChapters(chaptersToRender) {
+        chaptersContainer.innerHTML = "";
+
+        chaptersToRender.forEach((chapter) => {
+          const chapterBlock = document.createElement("div");
+          chapterBlock.className = "chapter-block";
+
+          chapterBlock.innerHTML = `
+            <button
+              class="chapter-btn"
+              id="${chapter.id}-btn"
+              aria-controls="${chapter.id}-content"
+              aria-expanded="false"
+              onclick="toggleChapter('${chapter.id}')"
+            >
+              <span>${chapter.title}</span>
+              <span id="${chapter.id}-arrow" aria-hidden="true">◂</span>
+            </button>
+
+            <div id="${chapter.id}-content" class="chapter-content">
+              <div id="${chapter.id}-phrases"></div>
+            </div>
+          `;
+
+          chaptersContainer.appendChild(chapterBlock);
+
+          const phraseContainer = document.getElementById(`${chapter.id}-phrases`);
+          renderPhrasesIntoContainer(chapter.phrases, phraseContainer);
+        });
+      }
+
+      function renderPhrasesIntoContainer(phrasesList, containerEl) {
+        containerEl.innerHTML = "";
+
+        phrasesList.forEach((phrase) => {
+          const block = document.createElement("div");
+          block.className = "phrase-block";
+          block.innerHTML = `
+            <h2 id="heading-${phrase.id}" tabindex="0" aria-controls="content-${phrase.id}" aria-expanded="false"
+                onclick="toggleVisibility('${phrase.id}')" onkeydown="handleKey(event, '${phrase.id}')">
+              ${phrase.text}
+            </h2>
+            <div id="content-${phrase.id}" class="content-block">
+              <audio id="audio-${phrase.id}" controls preload="metadata" tabindex="-1">
+                <source src="${phrase.audio}">
+              </audio>
+              <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
+            </div>
+          `;
+          containerEl.appendChild(block);
+
+          fetchAndParseVTT(phrase);
+
+          const audio = document.getElementById(`audio-${phrase.id}`);
+          audio.addEventListener("play", () => startCaptions(phrase.id));
+          audio.addEventListener("pause", () => stopCaptions(phrase.id));
+          audio.addEventListener("ended", () => stopCaptions(phrase.id));
+        });
+      }
+
+      // -----------------------
+      // 4) Chapter + phrase toggles
+      // -----------------------
+      function stopAllPlayback() {
+        getAllPhrases().forEach((phrase) => {
+          const c = document.getElementById(`content-${phrase.id}`);
+          const h = document.getElementById(`heading-${phrase.id}`);
+          if (c) c.classList.remove("visible");
+          if (h) h.setAttribute("aria-expanded", "false");
+
+          const a = document.getElementById(`audio-${phrase.id}`);
+          if (a) a.pause();
+
+          stopCaptions(phrase.id);
+          const captionDiv = document.getElementById(`caption-${phrase.id}`);
+          if (captionDiv) captionDiv.textContent = "";
+        });
+      }
+
+      // NEW: close all other chapters (accordion behavior)
+      function closeAllChapters(exceptId = null) {
+        chapters.forEach((ch) => {
+          if (ch.id === exceptId) return;
+
+          const content = document.getElementById(`${ch.id}-content`);
+          const btn = document.getElementById(`${ch.id}-btn`);
+          const arrow = document.getElementById(`${ch.id}-arrow`);
+          if (!content || !btn || !arrow) return;
+
+          content.classList.remove("visible");
+          btn.setAttribute("aria-expanded", "false");
+          arrow.textContent = "◂";
+        });
+      }
+
+      // UPDATED: only one chapter open at a time
+      function toggleChapter(chapterId) {
+        const content = document.getElementById(`${chapterId}-content`);
+        const btn = document.getElementById(`${chapterId}-btn`);
+        const arrow = document.getElementById(`${chapterId}-arrow`);
+        if (!content || !btn || !arrow) return;
+
+        const isOpening = !content.classList.contains("visible");
+
+        if (isOpening) {
+          closeAllChapters(chapterId);
+        }
+
+        const isVisible = content.classList.toggle("visible");
+        btn.setAttribute("aria-expanded", isVisible ? "true" : "false");
+        arrow.textContent = isVisible ? "▾" : "◂";
+
+        if (!isVisible) stopAllPlayback();
+      }
+
+      function toggleVisibility(id) {
+        const all = getAllPhrases();
+
+        all.forEach((phrase) => {
+          const content = document.getElementById(`content-${phrase.id}`);
+          const heading = document.getElementById(`heading-${phrase.id}`);
+          const isCurrent = phrase.id === id;
+
+          if (!content || !heading) return;
+
           if (isCurrent) {
             const isVisible = content.classList.toggle("visible");
-            heading.setAttribute("aria-expanded", isVisible);
-            const audio = content.querySelector('audio');
-            if (isVisible) {
-              audio.setAttribute('tabindex', '0');
-            } else {
-              audio.setAttribute('tabindex', '-1');
+            heading.setAttribute("aria-expanded", isVisible ? "true" : "false");
+            const audio = content.querySelector("audio");
+            if (audio) audio.setAttribute("tabindex", isVisible ? "0" : "-1");
+
+            if (!isVisible) {
+              stopCaptions(phrase.id);
+              const captionDiv = document.getElementById(`caption-${phrase.id}`);
+              if (captionDiv) captionDiv.textContent = "";
             }
           } else {
             content.classList.remove("visible");
-            heading.setAttribute("aria-expanded", false);
-            const audio = content.querySelector('audio');
-            if (audio) audio.setAttribute('tabindex', '-1');
+            heading.setAttribute("aria-expanded", "false");
+            const audio = content.querySelector("audio");
+            if (audio) audio.setAttribute("tabindex", "-1");
+
+            stopCaptions(phrase.id);
+            const captionDiv = document.getElementById(`caption-${phrase.id}`);
+            if (captionDiv) captionDiv.textContent = "";
           }
+        });
+      }
+
+      function handleKey(e, id) {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleVisibility(id);
+        }
+      }
+
+      // -----------------------
+      // 5) VTT parsing + per-line word highlighting
+      // -----------------------
+      function fetchAndParseVTT(phrase) {
+        fetch(phrase.vtt)
+          .then((res) => {
+            if (!res.ok) throw new Error(`VTT HTTP ${res.status}: ${phrase.vtt}`);
+            return res.text();
+          })
+          .then((vttText) => {
+            const cues = [];
+            const blocks = vttText.replace(/\r/g, "").split(/\n\n+/);
+
+            blocks.forEach((block) => {
+              const lines = block.trim().split("\n");
+              const timeLineIndex = lines.findIndex((l) => l.includes("-->"));
+              if (timeLineIndex === -1) return;
+
+              const [startStr, endStr] = lines[timeLineIndex].split(" --> ").map((s) => s.trim());
+              const text = lines
+                .slice(timeLineIndex + 1)
+                .join(" ")
+                .trim();
+              if (!text) return;
+
+              const start = parseTime(startStr);
+              const end = parseTime(endStr);
+              const duration = Math.max(0.01, end - start);
+
+              const words = text.split(/\s+/);
+              const wordDuration = duration / Math.max(1, words.length);
+
+              const wordTimings = words.map((w, i) => ({
+                word: w,
+                start: start + i * wordDuration,
+                end: start + (i + 1) * wordDuration,
+              }));
+
+              cues.push({ start, end, text, words: wordTimings });
+            });
+
+            captionsData[phrase.id] = cues;
+          })
+          .catch((err) => console.error("VTT load/parse failed:", err));
+      }
+
+      function parseTime(timeStr) {
+        const [h, m, s] = timeStr.split(":");
+        const [sec, ms = "0"] = s.split(".");
+        return parseInt(h, 10) * 3600 + parseInt(m, 10) * 60 + parseInt(sec, 10) + parseInt(ms, 10) / 1000;
+      }
+
+      function startCaptions(id) {
+        const audio = document.getElementById(`audio-${id}`);
+        const captionDiv = document.getElementById(`caption-${id}`);
+        const cues = captionsData[id] || [];
+
+        stopCaptions(id);
+
+        intervals[id] = setInterval(() => {
+          const t = audio.currentTime;
+
+          const cue = cues.find((c) => t >= c.start && t <= c.end);
+          if (!cue) {
+            captionDiv.textContent = "";
+            return;
+          }
+
+          const highlighted = cue.words.map((w) => (t >= w.start && t <= w.end ? `<mark>${escapeHtml(w.word)}</mark>` : escapeHtml(w.word)));
+
+          captionDiv.innerHTML = highlighted.join(" ");
+        }, 80);
+      }
+
+      function stopCaptions(id) {
+        if (intervals[id]) clearInterval(intervals[id]);
+        intervals[id] = null;
+      }
+
+      function escapeHtml(str) {
+        return str.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+      }
+
+      // -----------------------
+      // 6) Init
+      // -----------------------
+      renderChapters(chapters);
+
+      document.addEventListener("keydown", function (e) {
+        if (e.ctrlKey && e.key === "k") {
+          e.preventDefault();
+          document.getElementById("searchInput").focus();
         }
       });
-    }
-
-    function handleKey(e, id) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleVisibility(id);
-      }
-    }
-
-    function fetchAndParseVTT(phrase) {
-      fetch(phrase.vtt)
-        .then(res => res.text())
-        .then(vttText => {
-          const captions = [];
-          const blocks = vttText.split(/\n\n+/);
-          blocks.forEach(block => {
-            const lines = block.trim().split('\n');
-            if (lines.length >= 2) {
-              const [start, end] = lines[0].split(' --> ');
-              const text = lines[1];
-              const words = text.trim().split(/\s+/);
-              const duration = parseTime(end) - parseTime(start);
-              const wordDuration = duration / words.length;
-              words.forEach((word, i) => {
-                captions.push({
-                  word,
-                  start: parseTime(start) + i * wordDuration,
-                  end: parseTime(start) + (i + 1) * wordDuration
-                });
-              });
-            }
-          });
-          captionsData[phrase.id] = captions;
-        });
-    }
-
-    function parseTime(timeStr) {
-      const [h, m, s] = timeStr.split(":");
-      const [sec, ms] = s.split(".");
-      return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(sec) + parseInt(ms) / 1000;
-    }
-
-    function startCaptions(id) {
-      const audio = document.getElementById(`audio-${id}`);
-      const captionDiv = document.getElementById(`caption-${id}`);
-      const captions = captionsData[id] || [];
-      intervals[id] = setInterval(() => {
-        const t = audio.currentTime;
-        const highlighted = captions.map(c =>
-          t >= c.start && t <= c.end ? `<mark>${c.word}</mark>` : c.word
-        );
-        captionDiv.innerHTML = highlighted.join(" ");
-      }, 100);
-    }
-
-    function stopCaptions(id) {
-      clearInterval(intervals[id]);
-    }
-
-    renderPhrases(phrases);
-
-    document.addEventListener("keydown", function (e) {
-      if (e.ctrlKey && e.key === 'k') {
-        e.preventDefault();
-        document.getElementById("searchInput").focus();
-      }
-    });
-  </script>
-</body>
-
+    </script>
+  </body>
 </html>
