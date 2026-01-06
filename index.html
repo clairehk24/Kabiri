@@ -598,7 +598,6 @@
 
         renderChapters(filtered);
       }
-
       // -----------------------
       // 3) Render chapters + phrases
       // -----------------------
@@ -610,21 +609,21 @@
           chapterBlock.className = "chapter-block";
 
           chapterBlock.innerHTML = `
-            <button
-              class="chapter-btn"
-              id="${chapter.id}-btn"
-              aria-controls="${chapter.id}-content"
-              aria-expanded="false"
-              onclick="toggleChapter('${chapter.id}')"
-            >
-              <span>${chapter.title}</span>
-              <span id="${chapter.id}-arrow" aria-hidden="true">◂</span>
-            </button>
+              <button
+                class="chapter-btn"
+                id="${chapter.id}-btn"
+                aria-controls="${chapter.id}-content"
+                aria-expanded="false"
+                onclick="toggleChapter('${chapter.id}')"
+              >
+                <span>${chapter.title}</span>
+                <span id="${chapter.id}-arrow" aria-hidden="true">◂</span>
+              </button>
 
-            <div id="${chapter.id}-content" class="chapter-content">
-              <div id="${chapter.id}-phrases"></div>
-            </div>
-          `;
+              <div id="${chapter.id}-content" class="chapter-content">
+                <div id="${chapter.id}-phrases"></div>
+              </div>
+            `;
 
           chaptersContainer.appendChild(chapterBlock);
 
@@ -640,23 +639,29 @@
           const block = document.createElement("div");
           block.className = "phrase-block";
           block.innerHTML = `
-            <h2 id="heading-${phrase.id}" tabindex="0" aria-controls="content-${phrase.id}" aria-expanded="false"
-                onclick="toggleVisibility('${phrase.id}')" onkeydown="handleKey(event, '${phrase.id}')">
-              ${phrase.text}
-            </h2>
-            <div id="content-${phrase.id}" class="content-block">
-              <audio id="audio-${phrase.id}" controls preload="metadata" tabindex="-1">
-                <source src="${phrase.audio}">
-              </audio>
-              <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
-            </div>
-          `;
+              <h2 id="heading-${phrase.id}" tabindex="0" aria-controls="content-${phrase.id}" aria-expanded="false"
+                  onclick="toggleVisibility('${phrase.id}')" onkeydown="handleKey(event, '${phrase.id}')">
+                ${phrase.text}
+              </h2>
+              <div id="content-${phrase.id}" class="content-block">
+                <audio id="audio-${phrase.id}" controls preload="metadata" tabindex="-1">
+                  <source src="${phrase.audio}">
+                </audio>
+                <div class="caption-display" id="caption-${phrase.id}" aria-live="polite"></div>
+              </div>
+            `;
           containerEl.appendChild(block);
 
           fetchAndParseVTT(phrase);
 
           const audio = document.getElementById(`audio-${phrase.id}`);
-          audio.addEventListener("play", () => startCaptions(phrase.id));
+
+          // UPDATED: when a new audio starts, stop all other audio automatically
+          audio.addEventListener("play", () => {
+            stopOtherAudio(phrase.id); // <-- fixed (was "topOtherAudio")
+            startCaptions(phrase.id);
+          });
+
           audio.addEventListener("pause", () => stopCaptions(phrase.id));
           audio.addEventListener("ended", () => stopCaptions(phrase.id));
         });
@@ -665,6 +670,23 @@
       // -----------------------
       // 4) Chapter + phrase toggles
       // -----------------------
+      function stopOtherAudio(currentPhraseId) {
+        getAllPhrases().forEach((phrase) => {
+          if (phrase.id === currentPhraseId) return;
+
+          const a = document.getElementById(`audio-${phrase.id}`);
+          if (a && !a.paused) {
+            a.pause(); // stops the other audio
+            a.currentTime = 0; // optional: reset to start
+          }
+
+          // stop captions + clear the caption line for the other audio
+          stopCaptions(phrase.id);
+          const captionDiv = document.getElementById(`caption-${phrase.id}`);
+          if (captionDiv) captionDiv.textContent = "";
+        });
+      }
+
       function stopAllPlayback() {
         getAllPhrases().forEach((phrase) => {
           const c = document.getElementById(`content-${phrase.id}`);
@@ -673,7 +695,10 @@
           if (h) h.setAttribute("aria-expanded", "false");
 
           const a = document.getElementById(`audio-${phrase.id}`);
-          if (a) a.pause();
+          if (a) {
+            a.pause();
+            a.currentTime = 0; // optional: reset to start
+          }
 
           stopCaptions(phrase.id);
           const captionDiv = document.getElementById(`caption-${phrase.id}`);
