@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spanish Audio with Custom Captions</title>
+    <title>Kabiri: Bilingual Bites​</title>
     <style>
       * {
         box-sizing: border-box;
@@ -469,13 +469,53 @@
             { id: "keep_covered_protect_skin", text: "Please keep this covered to protect your skin.", audio: "audio/Ch10/Ch10_173.m4a", vtt: "captions/Ch10/Ch10_173.vtt" },
             { id: "keep_covered_not_spread", text: "Please keep this covered so it doesn't spread to others.", audio: "audio/Ch10/Ch10_174.m4a", vtt: "captions/Ch10/Ch10_174.vtt" },
             { id: "wear_sunscreen_every_day", text: "You need to wear sunscreen every day to protect your skin.", audio: "audio/Ch10/Ch10_175.m4a", vtt: "captions/Ch10/Ch10_175.vtt" },
-            { id: "change_positions_every_two_hours", text: "You/They need to change positions at least every two hours to prevent bed sores.", audio: "audio/Ch10/Ch10_176.m4a", vtt: "captions/Ch10/Ch10_176.vtt" },
-            { id: "this_is_a_pressure_sore", text: "This is a pressure sore. You must keep pressure off it to let it heal until it is no longer red.", audio: "audio/Ch10/Ch10_177.m4a", vtt: "captions/Ch10/Ch10_177.vtt" },
+            {
+              id: "change_positions_every_two_hours",
+              text: "You/They need to change positions at least every two hours to prevent bed sores.",
+              audio: "audio/Ch10/Ch10_176.m4a",
+              vtt: "captions/Ch10/Ch10_176.vtt",
+            },
+            {
+              id: "this_is_a_pressure_sore",
+              text: "This is a pressure sore. You must keep pressure off it to let it heal until it is no longer red.",
+              audio: "audio/Ch10/Ch10_177.m4a",
+              vtt: "captions/Ch10/Ch10_177.vtt",
+            },
             { id: "immune_system_is_weak", text: "Your immune system is weak, so it's easier for you to get sick right now.", audio: "audio/Ch10/Ch10_178.m4a", vtt: "captions/Ch10/Ch10_178.vtt" },
-            { id: "wear_mask_wash_hands_avoid_crowds", text: "Please wear a mask, wash your hands often, and try to avoid crowds.", audio: "audio/Ch10/Ch10_179.m4a", vtt: "captions/Ch10/Ch10_179.vtt" },
+            {
+              id: "wear_mask_wash_hands_avoid_crowds",
+              text: "Please wear a mask, wash your hands often, and try to avoid crowds.",
+              audio: "audio/Ch10/Ch10_179.m4a",
+              vtt: "captions/Ch10/Ch10_179.vtt",
+            },
           ],
         },
-        { id: "ch11", title: "Chapter 11", phrases: [] },
+        {
+          id: "ch11",
+          title: "Chapter 11",
+          phrases: [
+            { id: "Urine", text: "Urine", audio: "audio/Ch11/Ch11_180.m4a", vtt: "captions/Ch11/Ch11_180.vtt" },
+            { id: "Kidney", text: "Kidney", audio: "audio/Ch11/Ch11_181.m4a", vtt: "captions/Ch11/Ch11_181.vtt" },
+            { id: "Ureter", text: "Ureter", audio: "audio/Ch11/Ch11_182.m4a", vtt: "captions/Ch11/Ch11_182.vtt" },
+            { id: "Urinary_bladder", text: "Urinary bladder", audio: "audio/Ch11/Ch11_183.m4a", vtt: "captions/Ch11/Ch11_183.vtt" },
+            { id: "Urethra", text: "Urethra", audio: "audio/Ch11/Ch11_184.m4a", vtt: "captions/Ch11/Ch11_184.vtt" },
+            { id: "Urinate", text: "Urinate", audio: "audio/Ch11/Ch11_185.m4a", vtt: "captions/Ch11/Ch11_185.vtt" },
+            { id: "Toilet", text: "Toilet", audio: "audio/Ch11/Ch11_186.m4a", vtt: "captions/Ch11/Ch11_186.vtt" },
+            { id: "Kidney_stone", text: "Kidney stone", audio: "audio/Ch11/Ch11_187.m4a", vtt: "captions/Ch11/Ch11_187.vtt" },
+            { id: "Do_you_need_to_urinate", text: "Do you need to urinate?", audio: "audio/Ch11/Ch11_188.m4a", vtt: "captions/Ch11/Ch11_188.vtt" },
+            { id: "Blood_in_urine", text: "Do you have blood in your urine?", audio: "audio/Ch11/Ch11_189.m4a", vtt: "captions/Ch11/Ch11_189.vtt" },
+            { id: "Leak_urine", text: "Do you ever leak urine when you don’t want to?", audio: "audio/Ch11/Ch11_190.m4a", vtt: "captions/Ch11/Ch11_190.vtt" },
+            { id: "Hurt_or_burn_urinate", text: "Does it hurt or burn when you urinate?", audio: "audio/Ch11/Ch11_191.m4a", vtt: "captions/Ch11/Ch11_191.vtt" },
+            { id: "Kidneys_not_working_well", text: "Your kidneys are not working well.", audio: "audio/Ch11/Ch11_192.m4a", vtt: "captions/Ch11/Ch11_192.vtt" },
+            { id: "Measure_fluids", text: "You need to measure how much fluid you drink and urinate every day.", audio: "audio/Ch11/Ch11_193.m4a", vtt: "captions/Ch11/Ch11_193.vtt" },
+            {
+              id: "Urine_pale_lemonade",
+              text: "You should drink enough water to make your urine the color of pale lemonade each day, but not enough to make it clear like water.",
+              audio: "audio/Ch11/Ch11_194.m4a",
+              vtt: "captions/Ch11/Ch11_194.vtt",
+            },
+          ],
+        },
         { id: "ch12", title: "Chapter 12", phrases: [] },
         { id: "ch13", title: "Chapter 13", phrases: [] },
       ];
@@ -522,7 +562,7 @@
       }
 
       // -----------------------
-      // 3) Render chapters + phrases (UPDATED: start collapsed)
+      // 3) Render chapters + phrases
       // -----------------------
       function renderChapters(chaptersToRender) {
         chaptersContainer.innerHTML = "";
@@ -603,7 +643,6 @@
         });
       }
 
-      // NEW: close all other chapters (accordion behavior)
       function closeAllChapters(exceptId = null) {
         chapters.forEach((ch) => {
           if (ch.id === exceptId) return;
@@ -619,7 +658,6 @@
         });
       }
 
-      // UPDATED: only one chapter open at a time
       function toggleChapter(chapterId) {
         const content = document.getElementById(`${chapterId}-content`);
         const btn = document.getElementById(`${chapterId}-btn`);
